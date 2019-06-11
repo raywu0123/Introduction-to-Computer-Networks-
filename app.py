@@ -11,6 +11,7 @@ import base64
 import os
 import uuid
 import io
+import time
 
 MugShot_PATH = 'static/mugshot'
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -26,8 +27,9 @@ login_manager.login_view = "login"
 login_manager.login_message = "Please LOG IN"
 login_manager.login_message_category = "info"
 
-socketio = SocketIO(app)
-async_mode = "eventlet"
+# async_mode = "eventlet"
+async_mode = "threading"
+socketio = SocketIO(app, async_mode=async_mode)
 
 video_camera = None
 global_frame = None
@@ -267,15 +269,15 @@ def croppic():
             'message': str(e),
         }
 
-@app.route('/video_viewer')
 # def video_viewer():
 #     t = threading.Thread(target = video_viewer2)
 #     t.start()
 #     return t
-
+@app.route('/video_viewer')
 def video_viewer():
     return Response(video_stream(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+                    
 @app.route('/record_status', methods=['POST'])
 def record_status():
     global video_camera 
@@ -297,10 +299,11 @@ def video_stream():
     global video_camera 
     global global_frame
 
-    if video_camera == None:
+    if video_camera is None:
         video_camera = VideoCamera()
         
     while True:
+        time.sleep(0.1)
         frame = video_camera.get_frame()
 
         if frame != None:
@@ -312,7 +315,7 @@ def video_stream():
                             b'Content-Type: image/jpeg\r\n\r\n' + global_frame + b'\r\n\r\n')
 
 if __name__ == '__main__':
-    HOST = '140.112.214.218'
+    HOST = ''
     PORT = 5000
-    socketio.run(app,host=HOST,port = PORT)
+    socketio.run(app, host=HOST, port=PORT)
     # socketio.run(app)

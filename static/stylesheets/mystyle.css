@@ -6,3 +6,8 @@
 .fa-cog:hover {
   color: #ff1f57;
 }
+
+#middle {
+  display: flex;
+  justify-content: space-between;
+}

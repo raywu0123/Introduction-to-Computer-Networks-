@@ -51,7 +51,7 @@ $(function () {
 
 
     $('.message-submit').click(function () {
-        // console.log('oo');
+        console.log('oo');
         insertMessage();
     });
 
